@@ -1,0 +1,211 @@
+clc;
+%
+RawData
+CacheData:
+outputData:store the 
+%
+1.copy the data file to the cacheDate  directory 
+2.CodeName and Times
+3.excute the script
+4.get the final data at the outputData directory
+
+CodeName='**';
+Times='**';
+
+
+inputFolder = '**/*/CacheData';
+cd(inputFolder);
+outputFolder = "**/*/outputData";
+
+files=dir(fullfile(inputFolder,'**/*.txt'));
+copiedFiles = {};
+KSS={};
+
+%duplicate all the .txt files with the strings '练习' in their names to outputFolder
+files=dir(fullfile(inputFolder,'**/*.txt'));
+copiedFiles = {};
+KSS={};
+
+for i = 1:length(files)
+     inputFile = fullfile(files(i).folder, files(i).name);
+
+     if contains(files(i).name,'练习')
+         continue;
+     else
+     copiedFile= fullfile(outputFolder,files(i).name);
+     copyfile(inputFile,copiedFile);
+     copiedFiles{end+1} =copiedFile;
+     end
+    
+end
+
+% rename the files in your needed formation
+
+sumfiles = dir(fullfile(outputFolder,'**/*.txt'));
+cd(outputFolder);
+
+
+for i = 1:length(sumfiles);
+    if contains(sumfiles(i).name,'点击***')
+        parts  =  strsplit(sumfiles(i).name,'点击***');
+        new_str =  parts{1};
+        new_name  =[new_str,CodeName,'-',Times,'.txt'];
+
+        movefile(fullfile(outputFolder,sumfiles(i).name),new_name);
+    
+    elseif contains(sumfiles(i).name,'点到**')
+         parts  =  strsplit(sumfiles(i).name,'点到**');
+         new_str =  parts{1};
+        new_name  =[new_str,CodeName,'-',Times,'.txt'];
+        movefile(fullfile(outputFolder,sumfiles(i).name),new_name);
+
+    elseif contains(sumfiles(i).name,'Gestu**')
+                  parts  =  strsplit(sumfiles(i).name,'GestureTask');
+         new_str =  parts{1};
+        new_name  =[new_str,'Leap','-',CodeName,'-',Times,'.txt'];
+        movefile(fullfile(outputFolder,sumfiles(i).name),new_name);
+
+    elseif contains(sumfiles(i).name,'警**')
+        parts  =  strsplit(sumfiles(i).name,'警**);
+
+        str_1 =  parts{1};
+        parts_2 = strsplit(parts{2},'.');
+        str_2 = parts_2{2};
+        new_name =[str_1,str_2,'-',CodeName,'-',Times,'.txt'];
+        movefile(fullfile(outputFolder,sumfiles(i).name),new_name);     
+
+    elseif contains(sumfiles(i).name,'节**')
+                 parts  =  strsplit(sumfiles(i).name,'节**');
+                 str_1 =  parts{1};
+                 parts_2 = strsplit(parts{2},'-');
+                 str_2=parts_2{1};
+                 str_3=parts_2{2};
+                 new_name  =[str_1,str_2,'-',str_3,'-',CodeName,'-',Times,'.txt'];
+                 movefile(fullfile(outputFolder,sumfiles(i).name),new_name);
+
+            
+    elseif contains(sumfiles(i).name,'单**')
+        parts  =  strsplit(sumfiles(i).name,'单**');
+        str_1 =  parts{1};
+        parts_2 = strsplit(parts{2},'-');
+        str_2 = parts_2{2};
+        new_name =[str_1,str_2,'-',CodeName,'-',Times,'.txt'];
+        movefile(fullfile(outputFolder,sumfiles(i).name),new_name);
+       
+    elseif contains(sumfiles(i).name,'单手**')
+        parts  =  strsplit(sumfiles(i).name,'单手**');
+
+        str_1 =  parts{1};
+       
+        new_name =[str_1,CodeName,'-',Times,'.txt'];
+        movefile(fullfile(outputFolder,sumfiles(i).name),new_name);
+          
+    elseif contains(sumfiles(i).name,'Trac**')
+        parts  =  strsplit(sumfiles(i).name,'Trac**');
+
+        str_1 =  parts{1};
+        parts_2 = strsplit(parts{2},'-');
+        str_2 = parts_2{2};
+        new_name =[str_1,str_2,'-',CodeName,'-',Times,'.txt'];
+       
+        movefile(fullfile(outputFolder,sumfiles(i).name),new_name);
+
+
+    end
+end
+
+
+
+%%How to cope with files which is created with the timestamp in their names and   we can't use "strsplit" to split their file names
+%deal with 'KSS' files
+
+KSS1_name = '';
+KSS1_date = Inf;
+KSS2_name = '';
+KSS2_date = -Inf;
+
+for i = 1:length(sumfiles)
+
+ % Check if the file name contains the string 'kks'
+    if contains(sumfiles(i).name, 'KSS')
+        % Get the file creation date
+        file_date = sumfiles(i).date;
+        % Update the appropriate variable
+        if file_date < KSS1_date
+            KSS1_name = sumfiles(i).name;
+            KSS1_date = file_date;        
+        elseif file_date > KSS2_date
+            KSS2_name = sumfiles(i).name;
+            KSS2_date = file_date;          
+        end
+    end
+
+end
+
+% Rename the 'KSS' files
+
+if ~isempty(KSS1_name)
+    old_name = fullfile(outputFolder, KSS1_name);
+
+    new_name = ['Task00-KSS-',CodeName,'-',Times,'-','1','.txt'];
+    movefile(old_name, new_name);
+end
+if ~isempty(KSS2_name)
+    old_name = fullfile(outputFolder, KSS2_name);
+    new_name = ['Task00-KSS-',CodeName,'-',Times,'-','2','.txt'];
+    movefile(old_name, new_name);
+end
+
+
+
+%%
+
+%%dealing with .db files
+
+files_db=dir(fullfile(inputFolder,'**/*.db'));
+%copy .db files to  OutData
+
+for i  =1:length(files_db)
+    inputFile_db = fullfile(files_db(i).folder, files_db(i).name);
+    copiedFile= fullfile(outputFolder,files_db(i).name);
+    copyfile(inputFile_db,copiedFile);
+end
+
+%find which .db file is created first 
+db1_name = '';
+db1_date = Inf;
+db2_name = '';
+db2_date = -Inf;
+
+for i = 1:length(files_db)
+
+ % Check if the file name contains the string '.db'
+    if contains(files_db(i).name, '.db')
+        % Get the file creation date
+        file_date = files_db(i).date;
+     
+        % Update the appropriate variable
+        if file_date < db1_date
+            db1_name = files_db(i).name;
+            db1_date = file_date;
+             
+        elseif file_date > db2_date
+            db2_name = files_db(i).name;    
+        end
+    end
+
+end
+
+% Rename the '.db' files
+
+if ~isempty(db1_name)
+    old_name = fullfile(outputFolder, db1_name);
+
+    new_name = ['Task00-EyeHandTestDataBase-',CodeName,'-',Times,'-','1','.db'];
+    movefile(old_name, new_name);
+end
+if ~isempty(db2_name)
+    old_name = fullfile(outputFolder, db2_name);
+    new_name = ['Task00-EyeHandTestDataBase-',CodeName,'-',Times,'-','2','.db'];
+    movefile(old_name, new_name);
+end
