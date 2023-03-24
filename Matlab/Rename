@@ -99,16 +99,7 @@ for i = 1:length(sumfiles);
        
         new_name =[str_1,CodeName,'-',Times,'.txt'];
         movefile(fullfile(outputFolder,sumfiles(i).name),new_name);
-          
-    elseif contains(sumfiles(i).name,'Trac**')
-        parts  =  strsplit(sumfiles(i).name,'Trac**');
-
-        str_1 =  parts{1};
-        parts_2 = strsplit(parts{2},'-');
-        str_2 = parts_2{2};
-        new_name =[str_1,str_2,'-',CodeName,'-',Times,'.txt'];
-       
-        movefile(fullfile(outputFolder,sumfiles(i).name),new_name);
+      
 
 
     end
@@ -209,3 +200,17 @@ if ~isempty(db2_name)
     new_name = ['Task00-EyeHandTestDataBase-',CodeName,'-',Times,'-','2','.db'];
     movefile(old_name, new_name);
 end
+#Dealing with Task08 which generate two files in one task, luckily,two files are ceated in chronological order;
+
+Task08Files = sumfiles(contains({sumfiles.name},"Task08"));
+[~,sortInx]=sort([Task08Files.datenum]);
+
+sortedFiles= Task08Files(sortInx);
+movefile(sortedFiles(1).name,['Task08-Tracking-',CodeName,Times,'-set06','.txt']);
+movefile(sortedFiles(2).name,['Task08-Memory-',CodeName,Times,'-set06','.txt']);
+movefile(sortedFiles(3).name,['Task08-Tracking-',CodeName,Times,'-set03','.txt']);
+movefile(sortedFiles(4).name,['Task08-Memory-',CodeName,Times,'-set03','.txt']);
+
+
+
+
